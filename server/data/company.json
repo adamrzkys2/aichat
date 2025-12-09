@@ -1,0 +1,95 @@
+{
+  "name": "TECH-C Robotic & Coding",
+  "legal_name": "PT Techo Training Center",
+  "slogan": "Learn, Create, Innovate!",
+  "profile": "TECH-C Robotic & Coding adalah lembaga pendidikan teknologi milik PT Techo Training Center, berdiri sejak 2019 di Kota Cilegon, Banten. Fokus pada pendidikan dan pelatihan robotik, coding, dan STEM.",
+  "address": "Taman Krakatau Blok J8 No. 24, Kota Cilegon, Banten",
+  "phone": "0877-1020-8101",
+  "email": "techc991@gmail.com",
+  "website": "https://www.tech-c.my.id",
+  "instagram": "@robotic.coding.techc",
+  "vision": "Menjadi lembaga pelatihan terdepan di Indonesia (Banten) yang membentuk generasi unggul, kreatif, dan berdaya saing global melalui pembelajaran berbasis teknologi khususnya (Robotic & Coding).",
+  "mission": [
+    "Menyediakan program pembelajaran robotik dan coding berbasis kurikulum kreatif dan aplikatif.",
+    "Mengembangkan kemampuan berpikir logis, pemecahan masalah, dan inovasi digital pada siswa.",
+    "Menjalin kemitraan dengan sekolah, instansi pendidikan, dan industri teknologi.",
+    "Mendorong siswa untuk menghasilkan karya teknologi yang bermanfaat bagi masyarakat."
+  ],
+  "programs": [
+    {
+      "id": "robotic_education",
+      "title": "Program Robotic Education",
+      "description": "Pembelajaran sistem robotik dasar hingga lanjutan menggunakan LEGO, Arduino, dan ESP32; materi meliputi sensor, aktuator, mekanik, dan logika pemrograman."
+    },
+    {
+      "id": "coding_for_kids_teens",
+      "title": "Coding for Kids & Teens",
+      "description": "Pengenalan logika pemrograman menggunakan Scratch, Python, dan C++; pengembangan aplikasi sederhana, game edukatif, dan proyek IoT."
+    },
+    {
+      "id": "workshops_competitions",
+      "title": "Workshop & Kompetisi",
+      "description": "Bootcamp, pelatihan intensif, serta penyelenggaraan lomba robotik tingkat lokal hingga nasional."
+    },
+    {
+      "id": "digital_maker_class",
+      "title": "Digital Maker Class",
+      "description": "Kelas desain teknologi, 3D printing, dan pengembangan produk inovatif."
+    }
+  ],
+  "advantages": [
+    "Tenaga pengajar profesional dan berpengalaman di bidang robotik dan teknologi pendidikan.",
+    "Kurikulum berbasis kompetensi abad 21 (4C: Critical Thinking, Creativity, Collaboration, Communication).",
+    "Metode pembelajaran learning by doing dan project-based learning.",
+    "Laboratorium robotik dan coding yang modern, interaktif, dan ramah anak.",
+    "Jaringan kerja sama yang luas dengan sekolah dan lembaga pendidikan di wilayah Banten dan sekitarnya."
+  ],
+  "achievements": [
+    "Peserta TECH-C berhasil meraih berbagai prestasi bergengsi di tingkat nasional dan internasional.",
+    "Juara IRDO 2025 – Tim Geginau (Robot Pemilah Sampah Cerdas berbasis Raspberry Pi 5).",
+    "Juara IRDO 2025 – Tim Nextron 11 (Robot AI Inovatif terintegrasi dengan Gemini API).",
+    "Juara 3 ERIC UNJ Internasional – Tim Geginau (SignaTalk Go).",
+    "Top 5 Inovasi Galeri Cilegon – Tim Geginau & Tim Nextron11."
+  ],
+  "organization": {
+    "director": "Rizki Rahayu Pratama",
+    "operations_manager": "Adam Rizki Hidayatullah",
+    "academic_coordinator": "Hashina Qiamu Mumtaziah",
+    "instructors": "Tim Tech-C Certified Instructors",
+    "support_staff": "Tim Support Tech-C"
+  },
+  "partners_examples": [
+    "SDIT Banten Islamic School",
+    "SDIT Al Hanif",
+    "SDIT Al-Khairiyah",
+    "SDI Daarel-Latief",
+    "SD Cendekia",
+    "SD YPWKS 2, 4, dan 5",
+    "SDIT Bina Bangsa",
+    "SDIT Al Izzah & SDIT Al Izzah 2",
+    "SDIT Irsyadul Ibad 2",
+    "SD Bosowa Al Azhar",
+    "MIN 1 Cilegon",
+    "SMP Al Azhar 27",
+    "MTsN 1, 2, dan 3 Cilegon",
+    "MTsN 1 Kota Serang",
+    "SMP Rendawa School",
+    "Singapore International School",
+    "Komunitas EduTech Indonesia"
+  ],
+  "contact": {
+    "address": "Taman Krakatau Blok J8 No. 24, Kota Cilegon, Banten",
+    "phone": "0877-1020-8101",
+    "email": "techc991@gmail.com",
+    "whatsapp": "https://wa.me/6287710208101",
+    "website": "https://www.tech-c.my.id",
+    "instagram": "https://instagram.com/robotic.coding.techc"
+  },
+  "pricing": [
+  { "id":"basic","title":"Paket Basic","price":"Rp 350.000 / bulan","desc":"Kelas 1x per minggu, materi dasar robotik & scratch, cocok untuk pemula." },
+  { "id":"pro","title":"Paket Pro","price":"Rp 700.000 / bulan","desc":"Kelas 2x per minggu, materi lanjutan Arduino/ESP32, akses lab." },
+  { "id":"bootcamp","title":"Bootcamp Intensif","price":"Rp 1.500.000","desc":"Bootcamp 3 hari full, proyek akhir dan sertifikat." }
+],
+  "motto": "Kami percaya bahwa masa depan dibangun melalui logika, kreativitas, dan inovasi anak bangsa.",
+  "aliases": ["TECH-C", "Tech-C Robotic & Coding", "TechC Robotic Coding"]
+}
