@@ -2,11 +2,12 @@
   "name": "aichat",
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "vite",
-    "server": "node server/index.js"
-  },
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+},
+
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",

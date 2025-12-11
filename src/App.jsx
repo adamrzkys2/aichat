@@ -13,6 +13,21 @@ export default function App() {
   const [showControls, setShowControls] = useState(true);
   const recognitionRef = useRef(null);
   const messagesEndRef = useRef(null);
+  // add this state:
+  const [company, setCompany] = useState(null);
+
+  // helper to build a short summary string
+  function companySummary(obj) {
+    if (!obj) return "";
+    const parts = [];
+    if (obj.name) parts.push(`Name: ${obj.name}`);
+    if (obj.aliases && obj.aliases.length) parts.push(`Aliases: ${obj.aliases.join(", ")}`);
+    if (obj.website) parts.push(`Website: ${obj.website}`);
+    if (obj.description) parts.push(`Description: ${obj.description}`);
+    if (obj.products && obj.products.length) parts.push(`Products: ${obj.products.join(", ")}`);
+    if (obj.location) parts.push(`Location: ${obj.location}`);
+    return parts.join("\n");
+  }
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -21,63 +36,160 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
+  // load company.json once on start and update the initial bot message
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/company.json");
+        if (!res.ok) throw new Error("company.json not found");
+        const data = await res.json();
+        setCompany(data);
+
+        // update first assistant message to include a short company intro
+        setMessages(prev => {
+          const intro = companySummary(data);
+          // replace first message text
+          if (prev.length && prev[0].role === "assistant") {
+            const copy = [...prev];
+            copy[0] = {
+              ...copy[0],
+              text: `Halo — saya Tech-C Bot. Tanyakan apa saja tentang TECH-C.\n\nRingkasan singkat:\n${intro}`
+            };
+            return copy;
+          }
+          return prev;
+        });
+      } catch (err) {
+        console.warn("Could not load company.json:", err);
+      }
+    })();
+  }, []); // run once
 
   function addMessage(role, text) {
     setMessages((prev) => [...prev, { id: Date.now(), role, text }]);
   }
+async function handleSend(e, quick = false) {
+  e?.preventDefault();
+  const text = (typeof quick === "string" ? quick : input).trim();
+  if (!text) return;
 
-  async function handleSend(e, quick = false) {
-    e?.preventDefault();
-    const text = (typeof quick === "string" ? quick : input).trim();
-    if (!text) return;
+  addMessage("user", text);
+  if (!quick) setInput("");
+  setLoading(true);
+  setTyping(true);
 
-    addMessage("user", text);
-    if (!quick) setInput("");
-    setLoading(true);
-    setTyping(true);
+  try {
+    // ===== CONFIG (replace these) =====
+    const GEMINI_API_KEY = "AIzaSyDcY-au5aNguXjPbribeWRo4awFfANXRVY";          // <-- REPLACE (unsafe)
+    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"; // <-- REPLACE if needed
+    // ==================================
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
-      });
+    // build contents with proper Gemini system prompt format
+const contents = [];
 
-      if (!res.ok) {
-        const t = await res.text();
-        throw new Error(t || "Server error");
+// 1) SYSTEM PROMPT / COMPANY INFO (context)
+if (company) {
+  const ctx = `
+Anda adalah Tech-C Bot.
+Gunakan HANYA informasi berikut untuk menjawab pertanyaan tentang TECH-C Robotic Coding:
+
+${companySummary(company)}
+
+- Jika user bertanya harga tetapi tidak ada dalam data, jawab:
+"Maaf, informasi harga belum tersedia; silakan hubungi ${company.contact?.phone || "0877-1020-8101"} atau kunjungi ${company.website || "https://www.tech-c.my.id"}"
+
+- Jangan berimajinasi atau mengarang.
+- Jika informasi tidak ada dalam company.json, katakan tidak tahu.  
+  `;
+
+  contents.push({
+    parts: [{ text: ctx }]
+  });
+}
+
+// 2) USER MESSAGE
+contents.push({
+  parts: [{ text }]
+});
+
+    const body = {
+      contents,
+      generationConfig: {
+        maxOutputTokens: 2048,
+        temperature: 0.6,
+        candidateCount: 1
       }
-      const data = await res.json();
-      // simulate streaming / typing effect
-      const reply = data.reply || "(no reply)";
-      // optional: progressive reveal
-      for (let i = 1; i <= reply.length; i += 12) {
-        const part = reply.slice(0, i);
-        if (i === 1) addMessage("assistant", part);
-        else setMessages((prev) => {
-          // replace last assistant text
-          const copy = [...prev];
-          const lastIdx = copy.map(m => m.role).lastIndexOf("assistant");
-          if (lastIdx >= 0) copy[lastIdx].text = part;
-          return copy;
-        });
-        await new Promise(r => setTimeout(r, 40));
+    };
+
+    const upstream = await fetch(GEMINI_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
+      },
+      body: JSON.stringify(body)
+    });
+
+    const raw = await upstream.text();
+    let upstreamJson = null;
+    try { upstreamJson = raw ? JSON.parse(raw) : null; } catch (e) { upstreamJson = null; }
+
+    if (!upstream.ok) {
+      throw new Error(`Upstream error ${upstream.status}: ${raw}`);
+    }
+
+    let reply = "(no reply)";
+    if (upstreamJson) {
+      if (Array.isArray(upstreamJson.candidates) && upstreamJson.candidates.length) {
+        const cand = upstreamJson.candidates[0];
+        if (cand?.content?.parts && cand.content.parts.some(p => p.text)) {
+          reply = cand.content.parts.map(p => p.text || "").filter(Boolean).join("\n");
+        } else if (cand.output_text) {
+          reply = cand.output_text;
+        } else {
+          reply = JSON.stringify(cand).slice(0, 2000);
+        }
+        if (cand.finishReason === "MAX_TOKENS") {
+          reply = "(Reply truncated — model hit token limit.)\n\n" + reply;
+        }
+      } else if (upstreamJson.output_text) {
+        reply = upstreamJson.output_text;
+      } else {
+        reply = JSON.stringify(upstreamJson).slice(0, 2000);
       }
-      // ensure final
-      setMessages((prev) => {
+    } else {
+      reply = raw ? `Upstream returned non-JSON response: ${raw}` : "(empty upstream response)";
+    }
+
+    // progressive reveal (typing effect)
+    for (let i = 1; i <= reply.length; i += 12) {
+      const part = reply.slice(0, i);
+      if (i === 1) addMessage("assistant", part);
+      else setMessages((prev) => {
         const copy = [...prev];
         const lastIdx = copy.map(m => m.role).lastIndexOf("assistant");
-        if (lastIdx >= 0) copy[lastIdx].text = reply;
+        if (lastIdx >= 0) copy[lastIdx].text = part;
         return copy;
       });
-    } catch (err) {
-      console.error(err);
-      addMessage("assistant", "Terjadi kesalahan: " + (err.message || err));
-    } finally {
-      setLoading(false);
-      setTimeout(() => setTyping(false), 300);
+      await new Promise(r => setTimeout(r, 40));
     }
+
+    // ensure final
+    setMessages((prev) => {
+      const copy = [...prev];
+      const lastIdx = copy.map(m => m.role).lastIndexOf("assistant");
+      if (lastIdx >= 0) copy[lastIdx].text = reply;
+      return copy;
+    });
+
+  } catch (err) {
+    console.error("handleSend error:", err);
+    addMessage("assistant", "Terjadi kesalahan: " + (err.message || err));
+  } finally {
+    setLoading(false);
+    setTimeout(() => setTyping(false), 300);
   }
+}
 
   const quickReplies = [
     "Ceritakan profil TECH-C singkat.",
