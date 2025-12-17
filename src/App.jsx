@@ -79,10 +79,9 @@ async function handleSend(e, quick = false) {
   setTyping(true);
 
   try {
-    // ===== CONFIG (replace these) =====
-    const GEMINI_API_KEY = "AIzaSyDcY-au5aNguXjPbribeWRo4awFfANXRVY";          // <-- REPLACE (unsafe)
-    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"; // <-- REPLACE if needed
-    // ==================================
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GEMINI_API_URL = import.meta.env.VITE_GEMINI_API_URL;
+
 
     // build contents with proper Gemini system prompt format
 const contents = [];
